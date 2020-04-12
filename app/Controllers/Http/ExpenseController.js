@@ -4,11 +4,14 @@ const TagExpense = use('App/Models/TagExpense');
 
 class ExpenseController {
   async create({request, response}){
-    const {description, value, period, users_id, tags, type} = request.body.payload;
+    let {description, value, period, users_id, tags, type} = request.body.payload;
     const range = period.split("/").reverse().join("");
+
+    value = value.toString().replace(",", ".");
 
     //Create Expense
     const create = await Expense.create({users_id, description, value, period, range, type});
+
     //Associate
     await create.tag().attach(tags);
 
@@ -35,15 +38,18 @@ class ExpenseController {
   }
 
   async update({request, response, auth}){
-    const { id, description, value, period, tags, users_id} = request.body.payload;
+    let { id, users_id } = request.body.payload;
+    let { description, value, period, tags } = request.body.payload;
+
+    value = value.toString().replace(",", ".");
 
     //Find and Update Expenses and Delete Tags
-    await Expense.query().where({id:id}).update({description, value, period});
+    await Expense.query().where({id: id, users_id: users_id}).update({description, value, period});
     await TagExpense.query().where({expense_id:id}).delete();
 
     //Find Expense and Attach Tags
-    let findExpense = await Expense.query().where({id: id, users_id: users_id}).with('tag').first();
-    await findExpense.tag().attach(tags);
+    let findExpense = await Expense.query().where({id: id, users_id: users_id}).first();
+    findExpense = await findExpense.tag().attach(tags);
 
     //Update Find
     const find = await Expense.query()

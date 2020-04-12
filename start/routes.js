@@ -17,7 +17,7 @@
 const Route = use('Route')
 
 Route.post('/create', "ExpenseController.create")
-Route.get('/read', "ExpenseController.read")
+Route.post('/read', "ExpenseController.read")
 Route.put('/update', "ExpenseController.update")
 Route.delete('/delete/id/:id/user-id/:users_id', "ExpenseController.delete")
 
