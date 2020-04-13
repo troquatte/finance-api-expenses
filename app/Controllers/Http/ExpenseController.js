@@ -39,12 +39,12 @@ class ExpenseController {
 
   async update({request, response, auth}){
     let { id, users_id } = request.body.payload;
-    let { description, value, period, tags } = request.body.payload;
+    let { description, value, period, tags, type } = request.body.payload;
 
     value = value.toString().replace(",", ".");
 
     //Find and Update Expenses and Delete Tags
-    await Expense.query().where({id: id, users_id: users_id}).update({description, value, period});
+    await Expense.query().where({id: id, users_id: users_id}).update({description, value, period, type});
     await TagExpense.query().where({expense_id:id}).delete();
 
     //Find Expense and Attach Tags
